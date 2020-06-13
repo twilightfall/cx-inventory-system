@@ -1,0 +1,54 @@
+﻿<Window x:Class="Ledger.StocksWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ledger"
+        mc:Ignorable="d"
+        Title="Inventory" Height="600" Width="800" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize" WindowStyle="ToolWindow" FontSize="16">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid ShowGridLines="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.3*"/>
+                    <ColumnDefinition Width="0.3*"/>
+                    <ColumnDefinition Width="0.3*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="5">
+                    <TextBlock TextWrapping="Wrap" Text="Search Card Name" Margin="2"/>
+                    <TextBox x:Name="NameSearchBox" Height="23" TextWrapping="Wrap" Margin="2"/>
+                    <Button x:Name="SearchNameButton" Content="Search Card Name" Margin="2" Click="SearchNameButton_Click"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="5,5,7.2,4.8" Grid.Column="1">
+                    <TextBlock TextWrapping="Wrap" Text="Search set code OR set name"/>
+                    <Separator BorderThickness="20" BorderBrush="Black"/>
+                    <TextBlock TextWrapping="Wrap" Text="Select Set Code" Margin="2"/>
+                    <ComboBox x:Name="SetBox" IsEditable="True" BorderBrush="Black" Margin="2"/>
+                    <Separator BorderThickness="20" BorderBrush="Black"/>
+                    <TextBlock TextWrapping="Wrap" Text="Search Set Name" Margin="2"/>
+                    <TextBox x:Name="SetNameBox" TextWrapping="Wrap" Margin="2"/>
+                    <Button x:Name="SearchSetsButton" Content="Search Sets" Margin="2" Click="SearchSetsButton_Click"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="5">
+                    <TextBlock Text="OTHER COMMANDS"/>
+                    <Separator BorderThickness="20" BorderBrush="Black" Margin="0,2"/>
+                    <Button x:Name="GetIDButton" Content="Get TCG Product IDs" Margin="2" Click="GetIDButton_Click"/>
+                    <Button x:Name="AddStocksButton" Content="Add Stocks" Margin="2" Click="AddStocksButton_Click"/>
+                    <Button x:Name="RemoveStocksButton" Content="Remove Stocks" Margin="2"/>
+                    <Button x:Name="ExportButton" Content="EXPORT PRICES" Margin="2" Click="ExportButton_Click"/>
+                </StackPanel>
+            </Grid>
+            <DataGrid x:Name="InvGrid" Grid.Row="1" Margin="5" IsReadOnly="True" AlternatingRowBackground="#FFD1D1D1" AlternationCount="1" SelectionMode="Single" SelectionUnit="CellOrRowHeader" CanUserReorderColumns="False" CanUserSortColumns="False"/>
+        </Grid>
+
+    </Grid>
+</Window>

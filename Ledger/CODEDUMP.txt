@@ -1,0 +1,137 @@
+﻿using Ledger.Classes;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+
+namespace Ledger
+{
+    /// <summary>
+    /// Interaction logic for OrderDetailsWindow.xaml
+    /// </summary>
+    public partial class OrderDetailsWindow : Window
+    {
+        private static SetList root = new SetList();
+        public string Param { get; set; }
+
+        public OrderDetailsWindow()
+        {
+            InitializeComponent();
+
+            Closing += (s, e) =>
+            {
+                MessageBoxResult result = MessageBox.Show("Are you sure you want to close this window?", "WARNING!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Cancel)
+                    e.Cancel = true;
+            };
+            Loaded += (s, e) =>
+            {
+                try
+                {
+                    var setCodes = (from code in root.Data select code.Code).ToList();
+
+                    SetCodeBox.ItemsSource = setCodes;
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+            };
+            SetCodeBox.SelectionChanged += (s, e) => { SetNameBox.Clear(); };
+            SetNameBox.TextChanged += (s, e) => { SetCodeBox.SelectedIndex = -1; };
+        }
+
+        public OrderDetailsWindow(string param)
+        {
+            InitializeComponent();
+            Param = param;
+
+            Closing += (s, e) =>
+            {
+                MessageBoxResult result = MessageBox.Show("Are you sure you want to close this window?", "WARNING!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Cancel)
+                    e.Cancel = true;
+            };
+            Loaded += (s, e) =>
+            {
+                try
+                {
+                    var setCodes = (from code in root.Data select code.Code).ToList();
+
+                    SetCodeBox.ItemsSource = setCodes;
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+            };
+            SetCodeBox.SelectionChanged += (s, e) => { SetNameBox.Clear(); };
+            SetNameBox.TextChanged += (s, e) => { SetCodeBox.SelectedIndex = -1; };
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            NameBox.Clear();
+            SetCodeBox.SelectedIndex = -1;
+            SetNameBox.Clear();
+            SetCardnameOnlyCheck.IsChecked = false;
+            SetCodeCheck.IsChecked = false;
+            SetNameCheck.IsChecked = false;
+        }
+
+        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            SqlCommand comm = new SqlCommand();
+
+            string nameSearch =
+                string.Format("select TCGProdId, CollectorNumber, CardName, SetName from Inventory where CardName like '%{0}%'", NameBox.Text);
+
+            if (SetCardnameOnlyCheck.IsChecked == true || (SetCardnameOnlyCheck.IsChecked == false && SetCodeCheck.IsChecked == false && SetNameCheck.IsChecked == false))
+                comm.CommandText = nameSearch;
+            else if (SetCodeCheck.IsChecked == true)
+            {
+                string nameCodeSearch =
+                string.Format("select TCGProdId, CollectorNumber, CardName, SetName from Inventory " +
+                              "where CardName like '%{0}%' and SetCode = {1}",
+                              NameBox.Text, SetCodeBox.SelectedItem.ToString().ToUpper());
+                comm.CommandText = nameCodeSearch;
+            }
+            else if (SetNameCheck.IsChecked == true)
+            {
+                string nameSetSearch =
+                string.Format("select TCGProdId, CollectorNumber, CardName, SetName from Inventory " +
+                              "where CardName like '%{0}%' and SetName like '%{1}%'",
+                              NameBox.Text, SetNameBox.Text);
+                comm.CommandText = nameSetSearch;
+            }
+
+            using (SqlConnection conn = new SqlConnection(App.connstring))
+            {
+                comm.Connection = conn;
+                conn.Open();
+                using (SqlDataAdapter da = new SqlDataAdapter(comm))
+                {
+
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    CardGrid.ItemsSource = dt.AsDataView();
+                }
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+    }
+}
